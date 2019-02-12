@@ -192,7 +192,7 @@
             deleteEmployee () {
                 const that = this;
                 console.log(this.deletableEmployee);
-                AXIOS.delete("/employee/delete/" + 11111/*this.deletableEmployee.id*/)
+                AXIOS.delete("/employee/delete/" + this.deletableEmployee.id)
                     .then(response => {
                         this.$refs.modalDelete.hide();
                         that.employees = response.data
