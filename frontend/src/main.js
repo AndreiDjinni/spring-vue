@@ -9,9 +9,18 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap'
 import 'babel-polyfill'
 
+import 'es6-promise/auto'
+
 Vue.use(BootstrapVue);
 
-import 'es6-promise/auto'
+import axios from "axios"
+
+axios.defaults.withCredentials = true
+
+// Setting up Axios on Vue Instance, for use via this.$axios
+Vue.prototype.$axios = axios.create({
+  baseURL: '/api'
+})
 
 Vue.config.productionTip = false
 

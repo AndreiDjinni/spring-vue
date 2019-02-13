@@ -113,8 +113,6 @@
 </template>
 
 <script>
-    import {AXIOS} from '../components/http-common'
-
     export default {
         data () {
             return {
@@ -136,7 +134,12 @@
             }
         },
         mounted() {
-            AXIOS.get('/employees').then(response => { this.employees = response.data})
+            this.$axios
+                .get('/employees')
+                .then(response => { this.employees = response.data})
+                .catch(e => {
+                    console.log(e)
+                })
         },
         methods: {
             showAddModal() {
@@ -147,7 +150,9 @@
             },
             addEmployee () {
                 const that = this;
-                AXIOS.post("/employee/add", this.newEmployee)
+
+                this.$axios
+                    .post("/employee/add", this.newEmployee)
                     .then(response => {
                         this.$refs.modalAdd.hide();
                         that.employees = response.data
@@ -169,7 +174,8 @@
             },
             updateEmployee () {
                 const that = this;
-                AXIOS.put("/employee/update", this.updatedEmployee)
+                this.$axios
+                    .put("/employee/update", this.updatedEmployee)
                     .then(response => {
                         this.$refs.modalUpdate.hide();
                         that.employees = response.data
@@ -191,8 +197,9 @@
             },
             deleteEmployee () {
                 const that = this;
-                console.log(this.deletableEmployee);
-                AXIOS.delete("/employee/delete/" + this.deletableEmployee.id)
+
+                this.$axios
+                    .delete("/employee/delete/" + this.deletableEmployee.id)
                     .then(response => {
                         this.$refs.modalDelete.hide();
                         that.employees = response.data
