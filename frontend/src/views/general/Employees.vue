@@ -34,11 +34,15 @@
             <template slot="actions" slot-scope="data">
                 <div style="display: flex; justify-content: space-between;">
                     <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-                    <b-button size="sm" @click.stop="showUpdateModal(data.item)" variant="warning" class="mr-1">
+                    <b-button size="sm" @click.stop="showUser(data.item)" variant="primary" class="mr-1" style="width: 4rem">
+                        View
+                    </b-button>
+                    <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
+                    <b-button size="sm" @click.stop="showUpdateModal(data.item)" variant="warning" class="mr-1" style="width: 4rem">
                         Update
                     </b-button>
                     <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-                    <b-button size="sm" @click.stop="showDeleteModal(data.item)" variant="danger" class="mr-1">
+                    <b-button size="sm" @click.stop="showDeleteModal(data.item)" variant="danger" class="mr-1" style="width: 4rem">
                         Delete
                     </b-button>
                 </div>
@@ -256,6 +260,10 @@
 
             resetAddModal () {
                 this.newEmployee = { id: null, firstName: '', lastName: '', salary: ''}
+            },
+
+            showUser (employee) {
+                this.$router.push({ name: 'employee', params: { id: employee.id }})
             },
 
             addEmployee () {

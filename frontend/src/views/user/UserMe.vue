@@ -1,38 +1,19 @@
 <template>
-    <div class="container">
-        <div class="mx-auto w-50">
-            <div class="card my-5">
-                <div class="card-body">
-                    <div class="rounded-circle user-icon-fone my-3 m-auto">
-                        <icon class="user-icon" name="user"></icon>
-                    </div>
-                    <h5 class="card-title text-center my-3">User info</h5>
-                    <div class="w-100">
-                        <div class="w-25 ml-5 d-inline-block">
-                            <p>Username</p>
-                        </div>
-                        <div class="w-50 ml-5 d-inline-block">
-                            <p>{{ currentUser.name }}</p>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <div class="w-25 ml-5 d-inline-block">
-                            <p>Email</p>
-                        </div>
-                        <div class="w-50 ml-5 d-inline-block">
-                            <p>{{ currentUser.email }}</p>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <div class="w-25 ml-5 d-inline-block">
-                            <p>Email verified</p>
-                        </div>
-                        <div class="w-50 ml-5 d-inline-block">
-                            <p>{{ currentUser.emailVerified }}</p>
-                        </div>
-                    </div>
+    <div class="d-flex justify-content-between">
+        <div class="left-panel w-24">
+            <div class="w-100 user-info">
+                <div class="rounded-circle user-icon-fone">
+                    <icon class="user-icon" name="user"></icon>
+                </div>
+                <div>
+                    <div class="user-name text-center">{{currentUser.name}}</div>
                 </div>
             </div>
+            <div class="w-100 user-nav mt-2rem">
+            </div>
+        </div>
+        <div class="right-panel w-75 d-flex justify-content-center align-content-center">
+            <div class="user-email text-center my-auto">{{currentUser.email}}</div>
         </div>
     </div>
 </template>
@@ -65,20 +46,52 @@
 </script>
 
 <style scoped>
+    .w-24 {
+        width: 24% !important;
+    }
+    .mt-2rem {
+        margin-top: 1rem;
+    }
+    .left-panel {
+
+    }
+    .right-panel {
+        border: 1px solid lightgray;
+        border-radius: 0.3rem;
+        height: 25rem;
+    }
+    .user-info {
+        display: flex;
+        border: 1px solid lightgray;
+        border-radius: 0.3rem;
+        height: 5rem;
+    }
+    .user-name {
+        margin-top: 0.5rem;
+        width: 11rem;
+    }
+    .user-email {
+        width: 11rem;
+    }
+    .user-nav {
+        border: 1px solid lightgray;
+        border-radius: 0.3rem;
+        height: 19rem;
+    }
     .user-icon-fone {
-        width: 10rem;
-        height: 10rem;
+        width: 4rem;
+        height: 4rem;
         background-color: aliceblue;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        margin: 0.5rem;
     }
-
     .user-icon {
         color: white;
-        width: 6rem;
-        height: 6rem;
+        width: 2rem;
+        height: 2rem;
         cursor: pointer;
     }
 </style>

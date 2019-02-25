@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Employees from '../views/general/Employees'
+import Employee from '../views/general/Employee'
 import SignIn from '../views/auth/SignIn'
 import SignUp from '../views/auth/SignUp'
 import UserMe from '../views/user/UserMe'
@@ -15,6 +16,11 @@ export default new Router({
       path: '/',
       name: 'employees',
       component: Employees,
+    },
+    {
+      path: '/employee/:id',
+      name: 'employee',
+      component: Employee
     },
     {
       path: '/sign-in',
