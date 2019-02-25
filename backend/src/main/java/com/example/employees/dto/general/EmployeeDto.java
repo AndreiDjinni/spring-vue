@@ -1,8 +1,8 @@
-package com.example.employees.model;
+package com.example.employees.dto.general;
 
 import java.util.Objects;
 
-public class EmployeeModel {
+public class EmployeeDto {
 
     /**
      * Unique identifier
@@ -60,7 +60,7 @@ public class EmployeeModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EmployeeModel that = (EmployeeModel) o;
+        EmployeeDto that = (EmployeeDto) o;
         return Objects.equals(id, that.id);
     }
 
@@ -71,7 +71,7 @@ public class EmployeeModel {
 
     @Override
     public String toString() {
-        return "EmployeeModel{" +
+        return "EmployeeDto{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

@@ -1,9 +1,19 @@
 <template>
-    <div>
-        <div class="add-employee-row">
-            <b-button size="sm" @click="showAddModal" class="my-1" variant="success">
-                Add employee
-            </b-button>
+    <div v-if="!loading">
+
+        <div class="w-100 my-2 d-flex">
+            <div class="w-25">
+                <b-form-input v-model="size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
+            </div>
+            <div class="w-50">
+                <b-pagination-nav v-model="currentPage" size="sm" :use-router="true" align="center"
+                                  :link-gen="linkGen" :number-of-pages="totalPages" />
+            </div>
+            <div class="w-25">
+                <b-button size="sm" @click="showAddModal" class="float-right" variant="success">
+                    Add employee
+                </b-button>
+            </div>
         </div>
 
         <b-table show-empty
@@ -114,8 +124,10 @@
 
 <script>
     export default {
+
         data () {
             return {
+                loading: true,
                 sortBy: null,
                 sortDesc: false,
                 sortDirection: 'asc',
@@ -127,40 +139,123 @@
                     { key: 'salary', sortable: true },
                     { key: 'actions', sortable: false, label: 'Actions', class: 'actions-col'}
                 ],
+                currentPage: 1,
+                size: 10,
+                totalPages: 1,
                 employees: [],
                 updatedEmployee: { id: '', firstName: '', lastName: '', salary: ''},
                 newEmployee: { id: null, firstName: '', lastName: '', salary: ''},
                 deletableEmployee: { id: null, firstName: '', lastName: '', salary: ''}
             }
         },
-        mounted() {
-            this.$axios
-                .get('/employees')
-                .then(response => { this.employees = response.data})
-                .catch(e => {
-                    console.log(e)
-                })
+
+        beforeRouteUpdate (to, from, next) {
+
+            // обрабатываем изменение параметров маршрута ...
+            let page = to.query.page;
+            let size = to.query.size;
+
+            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) {
+                this.size = parseInt(size)
+            }
+            else {
+                this.size = 10
+            }
+
+            if (page !== null && page !== '' && !isNaN(page) && page > 0) {
+                this.currentPage = parseInt(page)
+            }
+            else {
+                this.currentPage = 1
+            }
+
+            //обновляем DOM ...
+            this.getEmployees()
+
+            // не забываем вызвать next()
+            next()
         },
+
+        watch: {
+
+            size: function (newSize, oldSize) {
+
+                if (newSize !== null && newSize !== '' && !isNaN(newSize) && newSize > 0 && newSize <= 30) {
+
+                    this.size = newSize;
+
+                    let criteria = { page: this.currentPage, size: this.size}
+
+                    this.$router.push({ path: '/', query: criteria });
+                }
+            }
+        },
+
+        mounted() {
+
+            let page = this.$route.query.page;
+            let size = this.$route.query.size;
+
+            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) this.size = size;
+            if (page !== null && page !== '' && !isNaN(page) && page > 0) this.currentPage = page;
+
+            this.getEmployees()
+        },
+
         methods: {
+
+            getEmployees() {
+
+                let criteria = {
+                    size: this.size,
+                    page: this.currentPage
+                };
+
+                this.$axios
+                    .post('/employees', criteria)
+                    .then(response => {
+
+                        this.employees = response.data.employees;
+                        this.totalPages = response.data.totalPages;
+                        this.size = response.data.size;
+                        this.currentPage = response.data.page;
+
+                        this.loading = false;
+                    })
+                    .catch(e => { console.log(e) })
+            },
+
+            linkGen(pageNum) {
+
+                const that = this;
+
+                return {
+                    path: '/',
+                    query: { page : pageNum, size: that.size }
+                }
+            },
+
             showAddModal() {
                 this.$refs.modalAdd.show()
             },
+
             resetAddModal () {
                 this.newEmployee = { id: null, firstName: '', lastName: '', salary: ''}
             },
+
             addEmployee () {
-                const that = this;
 
                 this.$axios
                     .post("/employee/add", this.newEmployee)
-                    .then(response => {
+                    .then(() => {
+
                         this.$refs.modalAdd.hide();
-                        that.employees = response.data
+
+                        this.getEmployees()
                     })
-                    .catch(e => {
-                        console.log(e)
-                    })
+                    .catch(e => { console.log(e) })
             },
+
             showUpdateModal(item) {
                 this.updatedEmployee.id = item.id;
                 this.updatedEmployee.firstName = item.firstName;
@@ -169,21 +264,24 @@
 
                 this.$refs.modalUpdate.show()
             },
+
             resetUpdateModal () {
                 this.updatedEmployee = { id: '', firstName: '', lastName: '', salary: ''}
             },
+
             updateEmployee () {
-                const that = this;
+
                 this.$axios
                     .put("/employee/update", this.updatedEmployee)
-                    .then(response => {
+                    .then(() => {
+
                         this.$refs.modalUpdate.hide();
-                        that.employees = response.data
+
+                        this.getEmployees()
                     })
-                    .catch(e => {
-                        console.log(e)
-                    })
+                    .catch(e => { console.log(e) })
             },
+
             showDeleteModal(item) {
                 this.deletableEmployee.id = item.id;
                 this.deletableEmployee.firstName = item.firstName;
@@ -192,38 +290,41 @@
 
                 this.$refs.modalDelete.show()
             },
+
             resetDeleteModal () {
                 this.updatedEmployee = { id: null, firstName: '', lastName: '', salary: ''}
             },
+
             deleteEmployee () {
-                const that = this;
 
                 this.$axios
                     .delete("/employee/delete/" + this.deletableEmployee.id)
-                    .then(response => {
+                    .then(() => {
+
                         this.$refs.modalDelete.hide();
-                        that.employees = response.data
+
+                        this.getEmployees();
                     })
-                    .catch(e => {
-                        console.log(e)
-                    })
+                    .catch(e => { console.log(e) })
             }
         }
     }
 </script>
 
 <style scoped>
-    .add-employee-row {
-        display: flex;
-        justify-content: flex-end;
-    }
     .mt-hr {
         margin-top: 0.4rem;
+    }
+    .w-3rem {
+        width: 3rem;
     }
 </style>
 
 <style>
     .actions-col {
         width: 11rem;
+    }
+    .pagination {
+        margin-bottom: 0 !important;
     }
 </style>

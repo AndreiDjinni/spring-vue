@@ -1,6 +1,7 @@
 package com.example.employees.exception;
 
 import com.example.employees.exception.domain.ApiError;
+import com.example.employees.exception.exceptions.BadRequestException;
 import com.example.employees.exception.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,8 @@ public class GlobalExceptionHandler {
      * @param request The current request
      */
     @ExceptionHandler({
-            ResourceNotFoundException.class
+            ResourceNotFoundException.class,
+            BadRequestException.class
     })
     @Nullable
     public final ResponseEntity<ApiError> handleException(Exception ex, WebRequest request) {
@@ -47,7 +49,15 @@ public class GlobalExceptionHandler {
 
             ResourceNotFoundException rnfe = (ResourceNotFoundException) ex;
 
-            return handleResourceNotFoundException(rnfe, headers, status, request);
+            return handleException(rnfe, headers, status, request);
+        }
+        else if (ex instanceof BadRequestException) {
+
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
+            BadRequestException bre = (BadRequestException) ex;
+
+            return handleException(bre, headers, status, request);
         }
         else {
 
@@ -71,9 +81,9 @@ public class GlobalExceptionHandler {
      * @param status The selected response status
      * @return a {@code ResponseEntity} instance
      */
-    protected ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex,
-                                                                   HttpHeaders headers, HttpStatus status,
-                                                                   WebRequest request) {
+    protected ResponseEntity<ApiError> handleException(Exception ex,
+                                                       HttpHeaders headers, HttpStatus status,
+                                                       WebRequest request) {
 
         List<String> errors = Collections.singletonList(ex.getMessage());
 

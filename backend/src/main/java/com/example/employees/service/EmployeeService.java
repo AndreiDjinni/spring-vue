@@ -1,13 +1,18 @@
 package com.example.employees.service;
 
-import com.example.employees.data.EmployeeRepository;
+import com.example.employees.criteria.EmployeeCriteria;
+import com.example.employees.dto.general.EmployeeDto;
+import com.example.employees.dto.general.wrapper.EmployeeDtoWrapper;
+import com.example.employees.repository.EmployeeRepository;
 import com.example.employees.entity.Employee;
 import com.example.employees.exception.exceptions.ResourceNotFoundException;
-import com.example.employees.model.EmployeeModel;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,25 +23,32 @@ public class EmployeeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeService.class);
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    public List<EmployeeModel> getAll() {
+    @Autowired
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    public EmployeeDtoWrapper getAll(EmployeeCriteria criteria) {
 
         LOG.debug("Search employees...");
 
-        List<Employee> employees = employeeRepository.findAll();
+        Page<Employee> employees = employeeRepository.findAll(
+                PageRequest.of(
+                        criteria.getPage() - 1,
+                        criteria.getSize(),
+                        new Sort(Sort.Direction.DESC, "updated"))
+        );
 
-        LOG.info(String.format("Founded [ %s ] employees", employees.size()));
+        LOG.info(String.format("Founded [ %s ] employees", employees.getSize()));
 
-        return employees.stream()
-                .map( employee -> modelMapper.map(employee, EmployeeModel.class))
-                .collect(Collectors.toList());
+        return EmployeeDtoWrapper.build(employees, modelMapper);
     }
 
-    public EmployeeModel get(Long id) {
+    public EmployeeDto get(Long id) {
 
         LOG.debug(String.format("Search employee by id [ %s ] ...", id));
 
@@ -45,10 +57,10 @@ public class EmployeeService {
 
         LOG.info(String.format("Founded employee by id [ %s ]", id));
 
-        return modelMapper.map(employee, EmployeeModel.class);
+        return modelMapper.map(employee, EmployeeDto.class);
     }
 
-    public EmployeeModel add(EmployeeModel model) {
+    public EmployeeDto add(EmployeeDto model) {
 
         LOG.debug("Create employee...");
 
@@ -58,10 +70,10 @@ public class EmployeeService {
 
         LOG.info(String.format("Created employee [ %s ]", employee.toString()));
 
-        return modelMapper.map(employee, EmployeeModel.class);
+        return modelMapper.map(employee, EmployeeDto.class);
     }
 
-    public void update(EmployeeModel model) {
+    public void update(EmployeeDto model) {
 
         LOG.debug(String.format("Updating employee by id [ %s ] ...", model.getId()));
 
