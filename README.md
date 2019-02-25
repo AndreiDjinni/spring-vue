@@ -1,3 +1,3 @@
 # spring-vue
 
-![Alt text](/../spring-vue/screenshot.png?raw=true "View")
+![Alt text](/../screenshot.png?raw=true "View")
