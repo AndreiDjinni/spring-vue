@@ -51,6 +51,21 @@
             </template>
         </b-table>
 
+        <div class="w-100 my-2 d-flex">
+            <div class="w-25">
+                <b-form-input v-model="size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
+            </div>
+            <div class="w-50">
+                <b-pagination-nav v-model="currentPage" size="sm" :use-router="true" align="center"
+                                  :link-gen="linkGen" :number-of-pages="totalPages" />
+            </div>
+            <div class="w-25">
+                <b-button size="sm" @click="showAddModal" class="float-right" variant="success">
+                    Add employee
+                </b-button>
+            </div>
+        </div>
+
         <b-modal ref="modalAdd" centered @hide="resetAddModal" title="Add employee ...">
             <b-container style="padding-bottom: 10%;">
                 <b-row class="mb-1">
