@@ -1,6 +1,5 @@
 package com.example.employees.config;
 
-import com.example.employees.security.CustomAccessDeniedHandler;
 import com.example.employees.security.CustomUserDetailsService;
 import com.example.employees.security.NoRedirectStrategy;
 import com.example.employees.security.RestAuthenticationEntryPoint;
@@ -29,13 +28,11 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public SecurityConfig(CustomAccessDeniedHandler accessDeniedHandler, RestAuthenticationEntryPoint restAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
-        this.accessDeniedHandler = accessDeniedHandler;
+    public SecurityConfig(RestAuthenticationEntryPoint restAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.customUserDetailsService = customUserDetailsService;
     }

@@ -3,9 +3,9 @@ package com.example.employees.service;
 import com.example.employees.criteria.EmployeeCriteria;
 import com.example.employees.dto.general.EmployeeDto;
 import com.example.employees.dto.general.wrapper.EmployeeDtoWrapper;
-import com.example.employees.repository.EmployeeRepository;
 import com.example.employees.entity.Employee;
 import com.example.employees.exception.exceptions.ResourceNotFoundException;
+import com.example.employees.repository.EmployeesRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,20 +15,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class EmployeeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeService.class);
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeesRepository employeeRepository;
 
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeesRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
