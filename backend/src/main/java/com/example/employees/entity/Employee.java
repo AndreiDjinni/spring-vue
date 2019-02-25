@@ -1,6 +1,8 @@
 package com.example.employees.entity;
 
-import javax.persistence.Entity;
+import com.example.employees.dto.general.EmployeeDto;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -17,10 +19,22 @@ public class Employee extends BaseEntity {
     private String lastName;
 
     /**
+     * Is active
+     */
+    private Boolean active;
+
+    /**
      * Employee salary
      */
     private Integer salary;
 
+    @Basic
+    @Column(name = "department_id", nullable = false)
+    private Long departmentId;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", insertable = false, updatable = false)
+    private Department department;
 
     public String getFirstName() {
         return firstName;
@@ -38,12 +52,36 @@ public class Employee extends BaseEntity {
         this.lastName = lastName;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
     public Integer getSalary() {
         return salary;
     }
 
     public void setSalary(Integer salary) {
         this.salary = salary;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
     @Override
@@ -57,5 +95,18 @@ public class Employee extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    public static Employee build(EmployeeDto dto) {
+        Employee employee = new Employee();
+
+        employee.setId(dto.getId());
+        employee.setFirstName(dto.getFirstName());
+        employee.setLastName(dto.getLastName());
+        employee.setActive(dto.getActive());
+        employee.setSalary(dto.getSalary());
+        employee.setDepartmentId(dto.getDepartmentId());
+
+        return employee;
     }
 }

@@ -3,6 +3,7 @@ package com.example.employees.controller;
 import com.example.employees.criteria.EmployeeCriteria;
 import com.example.employees.dto.general.EmployeeDto;
 import com.example.employees.dto.general.wrapper.EmployeeDtoWrapper;
+import com.example.employees.service.DepartmentService;
 import com.example.employees.service.EmployeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +24,12 @@ public class EmployeeController {
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
 
     private final EmployeeService employeeService;
+    private final DepartmentService departmentService;
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(EmployeeService employeeService, DepartmentService departmentService) {
         this.employeeService = employeeService;
+        this.departmentService = departmentService;
     }
 
     @PostMapping("/employees")
@@ -39,7 +43,7 @@ public class EmployeeController {
 
     @PostMapping("/employee/add")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity add(@RequestBody EmployeeDto model) {
+    public ResponseEntity add(@Valid @RequestBody EmployeeDto model) {
 
         LOG.info("POST [ /employee/add ]");
 
@@ -59,7 +63,7 @@ public class EmployeeController {
 
     @PutMapping("/employee/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity update(@RequestBody EmployeeDto model) {
+    public ResponseEntity update(@Valid @RequestBody EmployeeDto model) {
 
         LOG.info("PUT [ /employee/update ]");
 
@@ -85,5 +89,14 @@ public class EmployeeController {
         EmployeeDtoWrapper employees = employeeService.getAll(criteria);
 
         return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping("/departments")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity getAllDepartments() {
+
+        LOG.info("GET [ /departments ]");
+
+        return ResponseEntity.ok(departmentService.getAll());
     }
 }

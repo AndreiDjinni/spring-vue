@@ -84,14 +84,15 @@ public class EmployeeDtoWrapper {
                 '}';
     }
 
-    public static EmployeeDtoWrapper build(Page<Employee> employees, ModelMapper mapper) {
+    public static EmployeeDtoWrapper build(Page<Employee> employees) {
 
         return new EmployeeDtoWrapper(
                 employees.getTotalPages(),
                 employees.getPageable().getPageNumber() + 1,
                 employees.getPageable().getPageSize(),
-                employees.get()
-                        .map( employee -> mapper.map(employee, EmployeeDto.class))
+                employees
+                        .get()
+                        .map(EmployeeDto::build)
                         .collect(Collectors.toList()));
     }
 }

@@ -31,6 +31,14 @@
                             <p>{{ employee.salary }}</p>
                         </div>
                     </div>
+                    <div class="w-100">
+                        <div class="w-25 ml-5 d-inline-block">
+                            <p>Department</p>
+                        </div>
+                        <div class="w-50 ml-5 d-inline-block">
+                            <p>{{ employee.departmentName }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

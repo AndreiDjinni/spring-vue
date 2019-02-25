@@ -31,6 +31,18 @@
             <template slot="firstName" slot-scope="data">
                 {{data.item.firstName}}
             </template>
+            <template slot="lastName" slot-scope="data">
+                {{data.item.lastName}}
+            </template>
+            <template slot="salary" slot-scope="data">
+                {{data.item.salary}}
+            </template>
+            <template slot="active" slot-scope="data">
+                {{data.item.active}}
+            </template>
+            <template slot="department" slot-scope="data">
+                {{data.item.departmentName}}
+            </template>
             <template slot="actions" slot-scope="data">
                 <div style="display: flex; justify-content: space-between;">
                     <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
@@ -46,12 +58,6 @@
                         Delete
                     </b-button>
                 </div>
-            </template>
-            <template slot="lastName" slot-scope="data">
-                {{data.item.lastName}}
-            </template>
-            <template slot="salary" slot-scope="data">
-                {{data.item.salary}}
             </template>
         </b-table>
 
@@ -90,6 +96,26 @@
                         <b-form-input v-model="newEmployee.salary" type="text" placeholder="Enter salary"></b-form-input>
                     </b-col>
                 </b-row>
+                <b-row class="mb-1">
+                    <b-col cols="4"><label class="mt-hr">Active</label></b-col>
+                    <b-col>
+                        <b-form-select v-model="newEmployee.active" :options="activeOptions">
+                            <template slot="first">
+                                <option :value="null" disabled>-- Select --</option>
+                            </template>
+                        </b-form-select>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-1">
+                    <b-col cols="4"><label class="mt-hr">Department</label></b-col>
+                    <b-col>
+                        <b-form-select v-model="newEmployee.departmentId" :options="departmentOptions">
+                            <template slot="first">
+                                <option :value="null" disabled>-- Select department --</option>
+                            </template>
+                        </b-form-select>
+                    </b-col>
+                </b-row>
             </b-container>
             <div slot="modal-footer" class="w-100">
                 <b-btn size="sm" class="float-right px-4" variant="success" @click="addEmployee">
@@ -116,6 +142,26 @@
                     <b-col cols="4"><label class="mt-hr">Salary</label></b-col>
                     <b-col>
                         <b-form-input v-model="updatedEmployee.salary" type="text" placeholder="Enter salary"></b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-1">
+                    <b-col cols="4"><label class="mt-hr">Active</label></b-col>
+                    <b-col>
+                        <b-form-select v-model="updatedEmployee.active" :options="activeOptions">
+                            <template slot="first">
+                                <option :value="null" disabled>-- Select --</option>
+                            </template>
+                        </b-form-select>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-1">
+                    <b-col cols="4"><label class="mt-hr">Department</label></b-col>
+                    <b-col>
+                        <b-form-select v-model="updatedEmployee.departmentId" :options="departmentOptions">
+                            <template slot="first">
+                                <option :value="null" disabled>-- Select department --</option>
+                            </template>
+                        </b-form-select>
                     </b-col>
                 </b-row>
             </b-container>
@@ -156,15 +202,22 @@
                     { key: 'firstName', sortable: true },
                     { key: 'lastName', sortable: true },
                     { key: 'salary', sortable: true },
+                    { key: 'active', sortable: true },
+                    { key: 'department', sortable: true },
                     { key: 'actions', sortable: false, label: 'Actions', class: 'actions-col'}
                 ],
                 currentPage: 1,
                 size: 10,
                 totalPages: 1,
                 employees: [],
-                updatedEmployee: { id: '', firstName: '', lastName: '', salary: ''},
-                newEmployee: { id: null, firstName: '', lastName: '', salary: ''},
-                deletableEmployee: { id: null, firstName: '', lastName: '', salary: ''}
+                departments: [],
+                activeOptions: [
+                    { text: 'Yes', value: 'true' },
+                    { text: 'No', value: 'false' }
+                ],
+                updatedEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null},
+                newEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null},
+                deletableEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null}
             }
         },
 
@@ -210,6 +263,22 @@
             }
         },
 
+        computed: {
+
+            departmentOptions: function () {
+                let options = [];
+
+                for (let i = 0; i < this.departments.length; i++) {
+
+                    let department = this.departments[i];
+
+                    options.push({ value: department.id, text: department.name })
+                }
+
+                return options;
+            }
+        },
+
         mounted() {
 
             let page = this.$route.query.page;
@@ -244,6 +313,14 @@
                     .catch(e => { console.log(e) })
             },
 
+            getDepartments() {
+
+                this.$axios
+                    .get('/departments')
+                    .then(response => { this.departments = response.data; })
+                    .catch(e => { console.log(e) })
+            },
+
             linkGen(pageNum) {
 
                 const that = this;
@@ -255,11 +332,14 @@
             },
 
             showAddModal() {
+
+                if (this.departments.length === 0) this.getDepartments();
+
                 this.$refs.modalAdd.show()
             },
 
             resetAddModal () {
-                this.newEmployee = { id: null, firstName: '', lastName: '', salary: ''}
+                this.newEmployee = { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null }
             },
 
             showUser (employee) {
@@ -268,6 +348,7 @@
 
             addEmployee () {
 
+                debugger;
                 this.$axios
                     .post("/employee/add", this.newEmployee)
                     .then(() => {
@@ -280,19 +361,28 @@
             },
 
             showUpdateModal(item) {
+
+                if (this.departments.length === 0) this.getDepartments();
+
                 this.updatedEmployee.id = item.id;
                 this.updatedEmployee.firstName = item.firstName;
                 this.updatedEmployee.lastName = item.lastName;
                 this.updatedEmployee.salary = item.salary;
+                this.updatedEmployee.active = item.active;
+                this.updatedEmployee.departmentId = item.departmentId;
+                this.updatedEmployee.departmentName = item.departmentName;
 
                 this.$refs.modalUpdate.show()
             },
 
             resetUpdateModal () {
-                this.updatedEmployee = { id: '', firstName: '', lastName: '', salary: ''}
+                this.updatedEmployee = { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null}
             },
 
             updateEmployee () {
+
+                let x = this.updatedEmployee;
+                debugger;
 
                 this.$axios
                     .put("/employee/update", this.updatedEmployee)
@@ -310,12 +400,15 @@
                 this.deletableEmployee.firstName = item.firstName;
                 this.deletableEmployee.lastName = item.lastName;
                 this.deletableEmployee.salary = item.salary;
+                this.deletableEmployee.active = item.active;
+                this.deletableEmployee.departmentId = item.departmentId;
+                this.deletableEmployee.departmentName = item.departmentName;
 
                 this.$refs.modalDelete.show()
             },
 
             resetDeleteModal () {
-                this.updatedEmployee = { id: null, firstName: '', lastName: '', salary: ''}
+                this.updatedEmployee = { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null }
             },
 
             deleteEmployee () {

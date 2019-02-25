@@ -6,7 +6,6 @@ import com.example.employees.dto.general.wrapper.EmployeeDtoWrapper;
 import com.example.employees.entity.Employee;
 import com.example.employees.exception.exceptions.ResourceNotFoundException;
 import com.example.employees.repository.EmployeesRepository;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +20,6 @@ public class EmployeeService {
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeService.class);
 
     private final EmployeesRepository employeeRepository;
-
-    private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     public EmployeeService(EmployeesRepository employeeRepository) {
@@ -42,7 +39,7 @@ public class EmployeeService {
 
         LOG.info(String.format("Founded [ %s ] employees", employees.getSize()));
 
-        return EmployeeDtoWrapper.build(employees, modelMapper);
+        return EmployeeDtoWrapper.build(employees);
     }
 
     public EmployeeDto get(Long id) {
@@ -54,32 +51,32 @@ public class EmployeeService {
 
         LOG.info(String.format("Founded employee by id [ %s ]", id));
 
-        return modelMapper.map(employee, EmployeeDto.class);
+        return EmployeeDto.build(employee);
     }
 
-    public EmployeeDto add(EmployeeDto model) {
+    public void add(EmployeeDto dto) {
 
         LOG.debug("Create employee...");
 
-        model.setId(null);
+        dto.setId(null);
 
-        Employee employee = employeeRepository.save(modelMapper.map(model, Employee.class));
+        Employee employee = employeeRepository.save(Employee.build(dto));
 
         LOG.info(String.format("Created employee [ %s ]", employee.toString()));
-
-        return modelMapper.map(employee, EmployeeDto.class);
     }
 
-    public void update(EmployeeDto model) {
+    public void update(EmployeeDto dto) {
 
-        LOG.debug(String.format("Updating employee by id [ %s ] ...", model.getId()));
+        LOG.debug(String.format("Updating employee by id [ %s ] ...", dto.getId()));
 
-        Employee employee = employeeRepository.findById(model.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", model.getId()));
+        Employee employee = employeeRepository.findById(dto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", dto.getId()));
 
-        employee.setFirstName(model.getFirstName());
-        employee.setLastName(model.getLastName());
-        employee.setSalary(model.getSalary());
+        employee.setFirstName(dto.getFirstName());
+        employee.setLastName(dto.getLastName());
+        employee.setSalary(dto.getSalary());
+        employee.setActive(dto.getActive());
+        employee.setDepartmentId(dto.getDepartmentId());
 
         employeeRepository.save(employee);
 
