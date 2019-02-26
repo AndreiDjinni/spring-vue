@@ -5,7 +5,7 @@ import com.example.employees.dto.general.EmployeeDto;
 import com.example.employees.dto.general.wrapper.EmployeeDtoWrapper;
 import com.example.employees.entity.Employee;
 import com.example.employees.exception.exceptions.ResourceNotFoundException;
-import com.example.employees.repository.EmployeesRepository;
+import com.example.employees.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +14,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class EmployeeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeService.class);
 
-    private final EmployeesRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public EmployeeService(EmployeesRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
