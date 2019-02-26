@@ -3,11 +3,11 @@
 
         <div class="w-100 my-2 d-flex">
             <div class="w-25">
-                <b-form-input v-model="size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
+                <b-form-input v-model="criteria.size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
             </div>
             <div class="w-50">
-                <b-pagination-nav v-model="currentPage" size="sm" :use-router="true" align="center"
-                                  :link-gen="linkGen" :number-of-pages="totalPages" />
+                <b-pagination-nav v-model="criteria.page" size="sm" :use-router="true" align="center"
+                                  :link-gen="linkGen" :number-of-pages="criteria.totalPages" />
             </div>
             <div class="w-25">
                 <b-button size="sm" @click="showAddModal" class="float-right" variant="success">
@@ -63,11 +63,11 @@
 
         <div class="w-100 my-2 d-flex">
             <div class="w-25">
-                <b-form-input v-model="size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
+                <b-form-input v-model="criteria.size" class="w-3rem" size="sm" type="text" placeholder="Enter size" />
             </div>
             <div class="w-50">
-                <b-pagination-nav v-model="currentPage" size="sm" :use-router="true" align="center"
-                                  :link-gen="linkGen" :number-of-pages="totalPages" />
+                <b-pagination-nav v-model="criteria.page" size="sm" :use-router="true" align="center"
+                                  :link-gen="linkGen" :number-of-pages="criteria.totalPages" />
             </div>
             <div class="w-25">
                 <b-button size="sm" @click="showAddModal" class="float-right" variant="success">
@@ -206,9 +206,12 @@
                     { key: 'department', sortable: true },
                     { key: 'actions', sortable: false, label: 'Actions', class: 'actions-col'}
                 ],
-                currentPage: 1,
-                size: 10,
-                totalPages: 1,
+                criteria: {
+                    size: 10,
+                    page: 1,
+                    search: '',
+                    totalPages: 1
+                },
                 employees: [],
                 departments: [],
                 activeOptions: [
@@ -227,19 +230,13 @@
             let page = to.query.page;
             let size = to.query.size;
 
-            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) {
-                this.size = parseInt(size)
-            }
-            else {
-                this.size = 10
-            }
+            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) this.criteria.size = parseInt(size);
+            else this.criteria.size = 10;
 
-            if (page !== null && page !== '' && !isNaN(page) && page > 0) {
-                this.currentPage = parseInt(page)
-            }
-            else {
-                this.currentPage = 1
-            }
+            if (page !== null && page !== '' && !isNaN(page) && page > 0) this.criteria.page = parseInt(page);
+            else this.criteria.page = 1;
+
+            this.criteria.search = to.query.search;
 
             //обновляем DOM ...
             this.getEmployees()
@@ -250,13 +247,13 @@
 
         watch: {
 
-            size: function (newSize, oldSize) {
+            'criteria.size' : function (newSize, oldSize) {
 
                 if (newSize !== null && newSize !== '' && !isNaN(newSize) && newSize > 0 && newSize <= 30) {
 
-                    this.size = newSize;
+                    this.criteria.size = newSize;
 
-                    let criteria = { page: this.currentPage, size: this.size}
+                    let criteria = { page: this.criteria.page, size: this.criteria.size, search: this.$route.query.search};
 
                     this.$router.push({ path: '/', query: criteria });
                 }
@@ -283,9 +280,11 @@
 
             let page = this.$route.query.page;
             let size = this.$route.query.size;
+            let search = this.$route.query.search;
 
-            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) this.size = size;
-            if (page !== null && page !== '' && !isNaN(page) && page > 0) this.currentPage = page;
+            if (size !== null && size !== '' && !isNaN(size) && size > 0 && size <= 30) this.criteria.size = size;
+            if (page !== null && page !== '' && !isNaN(page) && page > 0) this.criteria.page = page;
+            this.criteria.search = search;
 
             this.getEmployees()
         },
@@ -295,8 +294,9 @@
             getEmployees() {
 
                 let criteria = {
-                    size: this.size,
-                    page: this.currentPage
+                    size: this.criteria.size,
+                    page: this.criteria.page,
+                    search: this.criteria.search
                 };
 
                 this.$axios
@@ -304,9 +304,9 @@
                     .then(response => {
 
                         this.employees = response.data.employees;
-                        this.totalPages = response.data.totalPages;
-                        this.size = response.data.size;
-                        this.currentPage = response.data.page;
+                        this.criteria.totalPages = response.data.totalPages;
+                        this.criteria.size = response.data.size;
+                        this.criteria.page = response.data.page;
 
                         this.loading = false;
                     })
@@ -327,7 +327,7 @@
 
                 return {
                     path: '/',
-                    query: { page : pageNum, size: that.size }
+                    query: { page : pageNum, size: that.criteria.size, search: this.$route.query.search }
                 }
             },
 
@@ -348,7 +348,6 @@
 
             addEmployee () {
 
-                debugger;
                 this.$axios
                     .post("/employee/add", this.newEmployee)
                     .then(() => {
@@ -380,10 +379,7 @@
             },
 
             updateEmployee () {
-
-                let x = this.updatedEmployee;
-                debugger;
-
+                
                 this.$axios
                     .put("/employee/update", this.updatedEmployee)
                     .then(() => {

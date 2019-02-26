@@ -14,6 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class EmployeeService {
 
@@ -30,12 +33,21 @@ public class EmployeeService {
 
         LOG.debug("Search employees...");
 
-        Page<Employee> employees = employeeRepository.findAll(
-                PageRequest.of(
-                        criteria.getPage() - 1,
-                        criteria.getSize(),
-                        new Sort(Sort.Direction.DESC, "updated"))
-        );
+        Page<Employee> employees;
+
+        PageRequest pageRequest = PageRequest.of(
+                criteria.getPage() - 1,
+                criteria.getSize(),
+                new Sort(Sort.Direction.DESC, "updated"));
+
+        if (criteria.getSearch() != null) {
+
+            employees = employeeRepository.findByFirstNameStartingWith(criteria.getSearch(), pageRequest);
+        }
+        else {
+
+            employees = employeeRepository.findAll(pageRequest);
+        }
 
         LOG.info(String.format("Founded [ %s ] employees", employees.getSize()));
 

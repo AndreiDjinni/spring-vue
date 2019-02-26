@@ -38,7 +38,9 @@ public class EmployeeController {
 
         LOG.info("GET [ /employees ]");
 
-        return internalGetAll(criteria);
+        EmployeeDtoWrapper employees = employeeService.getAll(criteria);
+
+        return ResponseEntity.ok(employees);
     }
 
     @PostMapping("/employee/add")
@@ -81,14 +83,6 @@ public class EmployeeController {
         employeeService.delete(id);
 
         return ResponseEntity.noContent().build();
-    }
-
-
-    private ResponseEntity internalGetAll(EmployeeCriteria criteria) {
-
-        EmployeeDtoWrapper employees = employeeService.getAll(criteria);
-
-        return ResponseEntity.ok(employees);
     }
 
     @GetMapping("/departments")

@@ -1,3 +1,3 @@
 # spring-vue
 
-![Alt text](https://github.com/AndreiDjinni/spring-vue/blob/master/screen.png "Optional title")
+![Alt text](https://github.com/AndreiDjinni/spring-vue/blob/master/screenshot.png "Optional title")

@@ -10,6 +10,10 @@
                 </div>
             </div>
             <div class="w-100 user-nav mt-2rem">
+                <ul class="list-group list-group-flush p-3">
+                    <li class="list-group-item pointer nav-padding" @click="signOut">Sign Out</li>
+                    <li class="list-group-item"></li>
+                </ul>
             </div>
         </div>
         <div class="right-panel w-75 d-flex justify-content-center align-content-center">
@@ -41,6 +45,9 @@
 
         methods: {
 
+            signOut() {
+                this.$store.dispatch('signOut')
+            }
         }
     }
 </script>
@@ -93,5 +100,12 @@
         width: 2rem;
         height: 2rem;
         cursor: pointer;
+    }
+    .pointer {
+        cursor: pointer;
+    }
+    .nav-padding {
+        padding-top: 0.1rem;
+        padding-bottom: 0.1rem;
     }
 </style>

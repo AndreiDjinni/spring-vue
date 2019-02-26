@@ -2,7 +2,6 @@ package com.example.employees.dto.general.wrapper;
 
 import com.example.employees.dto.general.EmployeeDto;
 import com.example.employees.entity.Employee;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

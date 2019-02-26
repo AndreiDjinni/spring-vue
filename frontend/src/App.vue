@@ -17,7 +17,14 @@
                 <div class="rounded-circle user-icon-fone mr-3" @click="userMe">
                   <icon class="user-icon" name="user" @click="userMe"></icon>
                 </div>
-                <button type="button" class="btn btn-outline-light" @click="signOut">Sign Out</button>
+                <div>
+                  <b-input-group>
+                    <b-form-input v-model="search" />
+                    <b-input-group-append>
+                      <b-button type="button" variant="info" @click="callSearch">Search</b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </div>
               </div>
             </div>
           </div>
@@ -46,7 +53,7 @@
     data() {
 
       return {
-
+        search: null,
       }
     },
 
@@ -63,6 +70,8 @@
 
     mounted() {
       this.$store.dispatch('currentUser');
+
+      this.search = this.$route.query.search;
     },
 
     methods: {
@@ -79,12 +88,22 @@
         this.$router.push('/sign-up')
       },
 
-      signOut() {
-        this.$store.dispatch('signOut')
-      },
-
       userMe() {
         this.$router.push('/user/me')
+      },
+
+      callSearch() {
+
+        let page = this.$route.query.page;
+        let size = this.$route.query.size;
+
+        let criteria = {
+          page: page,
+          size: size,
+          search: this.search
+        };
+
+        this.$router.push({ path: '/', query: criteria });
       }
     }
   }
@@ -186,5 +205,9 @@
 
   .footer-info {
     color: white;
+  }
+
+  .mr-50 {
+    margin-right: 50% !important;
   }
 </style>
