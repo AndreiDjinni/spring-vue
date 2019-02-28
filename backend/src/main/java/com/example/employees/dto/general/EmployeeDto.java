@@ -29,6 +29,7 @@ public class EmployeeDto {
     /**
      * Employee salary
      */
+    @NotNull
     @Min(value = 0L)
     private Integer salary;
 
@@ -41,6 +42,7 @@ public class EmployeeDto {
     /**
      * Employee department id
      */
+    @NotNull
     @Min(value = 1L)
     private Long departmentId;
 

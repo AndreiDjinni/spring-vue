@@ -78,10 +78,22 @@
 
         <b-modal ref="modalAdd" centered @hide="resetAddModal" title="Add employee ...">
             <b-container style="padding-bottom: 10%;">
+                <b-row v-if="errors.firstName" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter First Name, please ...</i>
+                    </b-col>
+                </b-row>
                 <b-row class="mb-1">
                     <b-col cols="4"><label class="mt-hr">First Name</label></b-col>
                     <b-col>
                         <b-form-input v-model="newEmployee.firstName" type="text" placeholder="Enter first name"></b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.lastName" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter Last Name, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -90,10 +102,22 @@
                         <b-form-input v-model="newEmployee.lastName" type="text" placeholder="Enter last name"></b-form-input>
                     </b-col>
                 </b-row>
+                <b-row v-if="errors.salary" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter Salary, please ...</i>
+                    </b-col>
+                </b-row>
                 <b-row class="mb-1">
                     <b-col cols="4"><label class="mt-hr">Salary</label></b-col>
                     <b-col>
                         <b-form-input v-model="newEmployee.salary" type="text" placeholder="Enter salary"></b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.active" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Select Active, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -104,6 +128,12 @@
                                 <option :value="null" disabled>-- Select --</option>
                             </template>
                         </b-form-select>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.departmentId" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Select Department, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -126,10 +156,22 @@
 
         <b-modal ref="modalUpdate" centered @hide="resetUpdateModal" title="Update employee ...">
             <b-container style="padding-bottom: 10%;">
+                <b-row v-if="errors.firstName" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter First Name, please ...</i>
+                    </b-col>
+                </b-row>
                 <b-row class="mb-1">
                     <b-col cols="4"><label class="mt-hr">First Name</label></b-col>
                     <b-col>
                         <b-form-input v-model="updatedEmployee.firstName" type="text" placeholder="Enter first name"></b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.lastName" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter Last Name, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -138,10 +180,22 @@
                         <b-form-input v-model="updatedEmployee.lastName" type="text" placeholder="Enter last name"></b-form-input>
                     </b-col>
                 </b-row>
+                <b-row v-if="errors.salary" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Enter Salary, please ...</i>
+                    </b-col>
+                </b-row>
                 <b-row class="mb-1">
                     <b-col cols="4"><label class="mt-hr">Salary</label></b-col>
                     <b-col>
                         <b-form-input v-model="updatedEmployee.salary" type="text" placeholder="Enter salary"></b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.active" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Select Active, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -152,6 +206,12 @@
                                 <option :value="null" disabled>-- Select --</option>
                             </template>
                         </b-form-select>
+                    </b-col>
+                </b-row>
+                <b-row v-if="errors.departmentId" class="error">
+                    <b-col cols="4"></b-col>
+                    <b-col>
+                        <i class="error-text">Select Department, please ...</i>
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
@@ -220,7 +280,14 @@
                 ],
                 updatedEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null},
                 newEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null},
-                deletableEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null}
+                deletableEmployee: { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null},
+                errors: {
+                    firstName: false,
+                    lastName: false,
+                    salary: false,
+                    active: false,
+                    departmentId: false
+                }
             }
         },
 
@@ -339,6 +406,9 @@
             },
 
             resetAddModal () {
+
+                this.resetErrors();
+
                 this.newEmployee = { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null }
             },
 
@@ -348,6 +418,8 @@
 
             addEmployee () {
 
+                const that = this;
+
                 this.$axios
                     .post("/employee/add", this.newEmployee)
                     .then(() => {
@@ -356,7 +428,16 @@
 
                         this.getEmployees()
                     })
-                    .catch(e => { console.log(e) })
+                    .catch(e => {
+
+                        console.log(e);
+
+                        that.resetErrors();
+
+                        e.response.data.errors.forEach(function(element) {
+                            that.errors[element.field] = true;
+                        });
+                    })
             },
 
             showUpdateModal(item) {
@@ -375,11 +456,16 @@
             },
 
             resetUpdateModal () {
+
+                this.resetErrors();
+
                 this.updatedEmployee = { id: null, firstName: '', lastName: '', salary: '', active: null, departmentId: null, departmentName: null}
             },
 
             updateEmployee () {
-                
+
+                const that = this;
+
                 this.$axios
                     .put("/employee/update", this.updatedEmployee)
                     .then(() => {
@@ -388,7 +474,16 @@
 
                         this.getEmployees()
                     })
-                    .catch(e => { console.log(e) })
+                    .catch(e => {
+
+                        console.log(e);
+
+                        that.resetErrors();
+
+                        e.response.data.errors.forEach(function(element) {
+                            that.errors[element.field] = true;
+                        });
+                    })
             },
 
             showDeleteModal(item) {
@@ -418,6 +513,12 @@
                         this.getEmployees();
                     })
                     .catch(e => { console.log(e) })
+            },
+
+            resetErrors () {
+                for (let key in this.errors) {
+                    this.errors[key] = false;
+                }
             }
         }
     }

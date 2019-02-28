@@ -210,4 +210,14 @@
   .mr-50 {
     margin-right: 50% !important;
   }
+
+  .error {
+      height: 1rem;
+      margin-bottom: 0.2rem;
+  }
+
+  .error-text {
+      color: forestgreen;
+      font-size: 0.7rem;
+  }
 </style>
